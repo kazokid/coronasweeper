@@ -113,14 +113,14 @@ def nista(event):
 def zastavica(i, y):
     global zastavica_l
     global broj_zastavica
-    boja=lista_polja[i][y].cget('bg')
-    if boja == 'grey':
-        lista_polja[i][y].config(bg='red', image=zastavica_slika)
+    slika=lista_polja[i][y].cget('image')
+    if slika == 'pyimage8':
+        lista_polja[i][y].config(image=zastavica_slika)
         lista_polja[i][y].bind('<Button-1>', nista)
         broj_zastavica += -1
         zastavica_l.config(text=broj_zastavica)
     else:
-        lista_polja[i][y].config(bg='grey', image=obicno)
+        lista_polja[i][y].config(image=obicno)
         lista_polja[i][y].bind('<Button-1>', lambda event, x=i, z=y: ciscenje_polja(x, z))
         broj_zastavica += 1
         zastavica_l.config(text=broj_zastavica)
@@ -139,7 +139,7 @@ def ciscenje_polja(i, y):
         prvi_klik = False
     if provjera_bomba(i, y, 1, False) == 0 and lista_bomba[i][y] != 'P':
         lista_bomba[i][y] = 'P'
-        lista_polja[i][y].config(bg='grey', image=rjeseno, relief='sunken', borderwidth=2)
+        lista_polja[i][y].config(bg='grey', image=rjeseno, relief='flat', borderwidth=2)
         lista_polja[i][y].bind('<Button-3>', nista)
         if i > 0:
             ciscenje_polja(i - 1, y)
@@ -162,7 +162,7 @@ def ciscenje_polja(i, y):
             for z in range(len(lista_bomba[x])):
                 if lista_bomba[x][z] == 1:
                     lista_polja[x][z].config(bg='red', image=virus)
-                if lista_polja[x][z].cget('bg') == 'red' and lista_bomba[x][z] != 1:
+                if lista_polja[x][z].cget('image') == 'pyimage10' and lista_bomba[x][z] != 1:
                     lista_polja[x][z].config(bg='red', image=pogresno)
         for x in range(len(lista_polja)):
             for z in range(len(lista_polja[x])):
@@ -172,7 +172,7 @@ def ciscenje_polja(i, y):
         for h in lista_bomba:
             print(*h)
     elif lista_bomba[i][y] != 'P':
-        lista_polja[i][y].config(image=provjera_bomba(i, y, 1, True), bg='grey', relief='sunken', borderwidth=2)
+        lista_polja[i][y].config(image=provjera_bomba(i, y, 1, True), bg='grey', relief='flat', borderwidth=2)
         lista_polja[i][y].bind('<Button-3>', nista)
         lista_bomba[i][y] = 'P'
     pobjeda = True
@@ -185,11 +185,14 @@ def ciscenje_polja(i, y):
             for y in range(len(lista_polja[i])):
                 if lista_bomba[i][y] == 1:
                     lista_polja[i][y].config(image=zastavica_slika)
+                lista_bomba[i][y] = 0
                 lista_polja[i][y].bind('<Button-1>', lambda event: start())
                 lista_polja[i][y].bind('<Button-3>', nista)
 
 
 def start():
+    global broj_zastavica
+    broj_zastavica = 15
     for i in lista_polja:
         for y in i:
             y = ''
@@ -207,7 +210,7 @@ def start():
     zastavica_l.grid(row=0, column=3, columnspan=2)
     for i in range(len(lista_polja)):
         for y in range(len(lista_polja[i])):
-            lista_polja[i][y] = Label(root, image=obicno, bg='grey', borderwidth=2, relief="raised")
+            lista_polja[i][y] = Label(root, image=obicno, bg='black', borderwidth=2, relief="raised")
             lista_polja[i][y].bind('<Button-1>', lambda event, x=i, z=y: ciscenje_polja(x, z))
             lista_polja[i][y].bind('<Button-3>', lambda event, x=i, z=y: zastavica(x, z))
             lista_polja[i][y].grid(row=i+1, column=y)
@@ -217,13 +220,10 @@ def hint():
     for z in range (len(lista_bomba)):
         for h in range (len(lista_bomba[z])):
             if lista_bomba[z][h] == 0 and provjera_bomba(z, h, 'P', False):
+                if lista_polja[z][h].cget('image') == 'pyimage10':
+                    lista_polja[z][h].bind('<Button-1>', lambda event, x=z, z=h: ciscenje_polja(x, z))
                 lista_polja[z][h].config(image=dezinficijens)
                 return
-
-
-
-
-
 
 
 start()
